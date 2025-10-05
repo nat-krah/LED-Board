@@ -1,18 +1,45 @@
 #include <Arduino.h>
 
-// put function declarations here:
-int myFunction(int, int);
+#include <FastLED.h>
+#include "fl/leds.h"
+#include "fl/xymap.h"
+ 
+constexpr uint16_t WIDTH  = 8;
+constexpr uint16_t HEIGHT = 8;
+constexpr uint16_t NUM_LEDS = HEIGHT * WIDTH;
+CRGB leds[NUM_LEDS];
 
+//Setup code
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  FastLED.addLeds<WS2812B, 5, GRB>(leds, NUM_LEDS);
+
+  Serial.begin(9600);
 }
 
+
+//Main Code
 void loop() {
-  // put your main code here, to run repeatedly:
-}
+  auto map   = fl::XYMap::constructRectangularGrid(HEIGHT, WIDTH);
+  fl::Leds s = fl::Leds(leds, map);
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+
+  int i = 0;
+  for (uint16_t y = 0; y < HEIGHT; ++y) {
+      for (uint16_t x = 0; x < WIDTH; ++x) {
+          s(x, y) = CRGB(1, 1 + i, 1 + i);
+          i++;
+
+          Serial.print(x);
+
+        delay(50);
+      }
+  }
+
+
+  for (uint16_t y = 0; y < HEIGHT; ++y) {
+    for (uint16_t x = 0; x < WIDTH; ++x) {
+      s(x, y) = CRGB(0,0,0);
+    }
+  }
+
 }
